@@ -2,6 +2,7 @@ package main
 
 import (
 	"food-delivery/components"
+	middleware "food-delivery/middlewares"
 	"log"
 	"os"
 
@@ -33,10 +34,10 @@ func main() {
 
 	log.Println("Connected:", db)
 
-	router := gin.Default()
-	// router.Use(middleware.Recover())
-
 	appCtx := component.NewAppContext(db)
+
+	router := gin.Default()
+	router.Use(middleware.Recover(appCtx))
 
 	mainRoute(router, appCtx)
 

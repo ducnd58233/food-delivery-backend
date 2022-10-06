@@ -2,11 +2,14 @@ package restaurantmodel
 
 import (
 	"errors"
+	"food-delivery/common"
 	"strings"
 )
 
+const EntityName = "Restaurant"
+
 type Restaurant struct {
-	Id   int    `json:"id" gorm:"column:id;"`
+	common.SQLModel `json:",inline"` // embed struct
 	Name string `json:"name" gorm:"column:name;"`
 	Addr string `json:"address" gorm:"column:addr;"`
 }

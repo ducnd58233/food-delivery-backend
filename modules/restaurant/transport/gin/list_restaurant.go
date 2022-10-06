@@ -16,21 +16,13 @@ func GetListRestaurantsHandler(appCtx component.AppContext) gin.HandlerFunc {
 		var filter restaurantmodel.Filter
 
 		if err := c.ShouldBind(&filter); err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-	
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		var paging common.Paging
 
 		if err := c.ShouldBind(&paging); err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-	
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		paging.Fulfill()
@@ -41,11 +33,7 @@ func GetListRestaurantsHandler(appCtx component.AppContext) gin.HandlerFunc {
 		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
 
 		if err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-	
-			return
+			panic(err)
 		}
 
 		c.JSON(http.StatusOK, common.NewSuccessResponse(result, paging, filter))
