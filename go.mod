@@ -11,6 +11,8 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.44.113 // indirect
+	github.com/btcsuite/btcd/btcutil v1.1.2
+	github.com/btcsuite/btcutil v1.0.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

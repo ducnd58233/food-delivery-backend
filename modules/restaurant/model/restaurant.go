@@ -1,12 +1,15 @@
 package restaurantmodel
 
 import (
-	"errors"
 	"food-delivery/common"
 	"strings"
 )
 
 const EntityName = "Restaurant"
+
+var (
+	ErrNameCannotBeEmpty = common.NewCustomError(nil, "restaurant name can't be blank", "ErrNameCannotBeEmpty")
+)
 
 type Restaurant struct {
 	common.SQLModel `json:",inline"` // embed struct
@@ -14,6 +17,7 @@ type Restaurant struct {
 	Addr            string           `json:"address" gorm:"column:addr;"`
 	Logo            *common.Image    `json:"logo" gorm:"column:logo;"`
 	Cover           *common.Images   `json:"cover" gorm:"column:cover;"`
+	LikedCount      int              `json:"liked_count" gorm:"-"`
 }
 
 func (Restaurant) TableName() string {
@@ -21,10 +25,11 @@ func (Restaurant) TableName() string {
 }
 
 type RestaurantCreate struct {
-	Name  string         `json:"name" gorm:"column:name;"`
-	Addr  string         `json:"address" gorm:"column:addr;"`
-	Logo  *common.Image  `json:"logo" gorm:"column:logo;"`
-	Cover *common.Images `json:"cover" gorm:"column:cover;"`
+	common.SQLModel `json:",inline"` // embed struct
+	Name            string           `json:"name" gorm:"column:name;"`
+	Addr            string           `json:"address" gorm:"column:addr;"`
+	Logo            *common.Image    `json:"logo" gorm:"column:logo;"`
+	Cover           *common.Images   `json:"cover" gorm:"column:cover;"`
 }
 
 func (RestaurantCreate) TableName() string {
@@ -46,8 +51,13 @@ func (res *RestaurantCreate) Validate() error {
 	res.Name = strings.TrimSpace(res.Name)
 
 	if len(res.Name) == 0 {
-		return errors.New("restaurant name cannot be blank")
+		return ErrNameCannotBeEmpty
 	}
 
 	return nil
+}
+
+// If admin or owner, show all information
+func (data *Restaurant) Mask(isAdminOrOwner bool) {
+	data.GenUID(common.DbTypeRestaurant)
 }

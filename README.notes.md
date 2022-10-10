@@ -5,9 +5,10 @@
 ![image](./public/images/go_service_architecture.png)
 - Modules:
     - Model: Entity of the SQL
-    - Storage: Working with DB
+    - Storage: Working with DB (for itself)
     - Biz: Do logic (Only receive data, Do nothing with DB - No gin, header, v.v)
-    - Transport: Parse data
+    - Transport: Parse data (Setup dependencies like redis, database)
+    - Repository: Provide data business model for business layer (like mocking LikeRestaurant to Restaurant)
 # Middleware
 - Middleware functions are functions that have access to the request data, and the next middleware function in application's request-response cycle
     - Execute any code

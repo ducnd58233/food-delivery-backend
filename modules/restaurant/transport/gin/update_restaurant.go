@@ -2,12 +2,11 @@ package restaurantgin
 
 import (
 	"food-delivery/common"
-	"food-delivery/components"
+	component "food-delivery/components"
 	restaurantbiz "food-delivery/modules/restaurant/biz"
 	restaurantmodel "food-delivery/modules/restaurant/model"
 	restaurantstorage "food-delivery/modules/restaurant/storage"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,8 +15,8 @@ func UpdateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data restaurantmodel.RestaurantUpdate
 
-		id, err := strconv.Atoi(c.Param("id"))
-		// uid, err := common.FromBase58(c.Param("restaurant_id"))
+		// id, err := strconv.Atoi(c.Param("id"))
+		uid, err := common.FromBase58(c.Param("id"))
 
 		if err != nil {
 			panic(common.ErrInvalidRequest(err))
@@ -30,7 +29,7 @@ func UpdateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 		storage := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
 		biz := restaurantbiz.NewUpdateRestaurantBiz(storage)
 
-		if err := biz.UpdateRestaurantById(c.Request.Context(), id, &data); err != nil {
+		if err := biz.UpdateRestaurantById(c.Request.Context(), int(uid.GetLocalID()), &data); err != nil {
 			panic(err)
 		}
 
