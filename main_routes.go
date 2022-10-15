@@ -1,9 +1,10 @@
 package main
 
 import (
+	component "food-delivery/components"
 	restaurantgin "food-delivery/modules/restaurant/transport/gin"
 	uploadgin "food-delivery/modules/upload/transport/gin"
-	"food-delivery/components"
+	usergin "food-delivery/modules/user/transport/gin"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +12,8 @@ import (
 func mainRoute(router *gin.Engine, appCtx component.AppContext) {
 	v1 := router.Group("/v1")
 	{
+		v1.POST("/register", usergin.RegisterHandler(appCtx))
+
 		restaurants := v1.Group("/restaurants")
 		{
 			restaurants.POST("", restaurantgin.CreateRestaurantHandler(appCtx))
