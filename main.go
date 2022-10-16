@@ -1,7 +1,7 @@
 package main
 
 import (
-	"food-delivery/components"
+	component "food-delivery/components"
 	"food-delivery/components/uploadprovider"
 	middleware "food-delivery/middlewares"
 	"log"
@@ -35,6 +35,11 @@ func main() {
 
 	log.Println("Connected:", db)
 
+	secretKey, ok := os.LookupEnv("SECRET_KEY")
+	if !ok {
+		log.Fatalln("Missing Secret Key string.")
+	}
+
 	s3Bucketname, ok := os.LookupEnv("S3_BUCKET_NAME")
 	if !ok {
 		log.Fatalln("Missing S3 Bucket Name string.")
@@ -60,9 +65,9 @@ func main() {
 		log.Fatalln("Missing S3 Domain string.")
 	}
 
-	s3Provider := uploadprovider.NewS3Provider(s3Bucketname,s3Region, s3APIKey, s3SecretKey, s3Domain)
+	s3Provider := uploadprovider.NewS3Provider(s3Bucketname, s3Region, s3APIKey, s3SecretKey, s3Domain)
 
-	appCtx := component.NewAppContext(db, s3Provider)
+	appCtx := component.NewAppContext(db, s3Provider, secretKey)
 
 	router := gin.Default()
 	router.Use(middleware.Recover(appCtx))
