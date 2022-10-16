@@ -9,6 +9,8 @@ require (
 	gorm.io/gorm v1.23.10
 )
 
+require github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+
 require (
 	github.com/aws/aws-sdk-go v1.44.113 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.2
