@@ -2,7 +2,7 @@ package restaurantgin
 
 import (
 	"food-delivery/common"
-	"food-delivery/components"
+	component "food-delivery/components"
 	restaurantbiz "food-delivery/modules/restaurant/biz"
 	restaurantmodel "food-delivery/modules/restaurant/model"
 	restaurantstorage "food-delivery/modules/restaurant/storage"
@@ -20,11 +20,11 @@ func CreateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 		}
 
 		requester := c.MustGet(common.CurrentUser).(common.Requester)
-		data.OwnerId = requester.GetUserId()
-	
+		data.UserId = requester.GetUserId()
+
 		store := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
 		biz := restaurantbiz.NewCreateRestaurantBiz(store)
-	
+
 		if err := biz.CreateRestaurant(c.Request.Context(), &data); err != nil {
 			panic(err)
 		}

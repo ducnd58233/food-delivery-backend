@@ -4,8 +4,6 @@ import (
 	"context"
 	"food-delivery/common"
 	usermodel "food-delivery/modules/user/model"
-
-	"gorm.io/gorm"
 )
 
 type RegisterStore interface {
@@ -37,20 +35,20 @@ func (biz *registerBiz) Register(ctx context.Context, data *usermodel.UserCreate
 		return usermodel.ErrEnailExisted
 	}
 
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return common.ErrDB(err)
+	if err != nil && err == common.ErrRecordNotFound {
+		salt := common.GenSalt(50)
+
+		data.Password = biz.hasher.Hash(data.Password + salt)
+		data.Salt = salt
+		data.Role = "user" // hard code
+		data.Status = 1
+
+		if err := biz.registerStore.Create(ctx, data); err != nil {
+			return common.ErrCannotCreateEntity(usermodel.EntityName, err)
+		}
+
+		return nil
 	}
 
-	salt := common.GenSalt(50)
-
-	data.Password = biz.hasher.Hash(data.Password + salt)
-	data.Salt = salt
-	data.Role = "user" // hard code
-	data.Status = 1
-
-	if err := biz.registerStore.Create(ctx, data); err != nil {
-		return common.ErrCannotCreateEntity(usermodel.EntityName, err)
-	}
-
-	return nil
+	return common.ErrDB(err)
 }
