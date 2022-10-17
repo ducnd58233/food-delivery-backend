@@ -5,6 +5,7 @@ import (
 	component "food-delivery/components"
 	restaurantbiz "food-delivery/modules/restaurant/biz"
 	restaurantmodel "food-delivery/modules/restaurant/model"
+	restaurantrepo "food-delivery/modules/restaurant/repo"
 	restaurantstorage "food-delivery/modules/restaurant/storage"
 	restaurantlikestorage "food-delivery/modules/restaurantlike/storage"
 	"net/http"
@@ -30,7 +31,8 @@ func GetListRestaurantsHandler(appCtx component.AppContext) gin.HandlerFunc {
 
 		store := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
 		likeStore := restaurantlikestorage.NewSQLStore(appCtx.GetMainDBConnection())
-		biz := restaurantbiz.NewListRestaurantBiz(store, likeStore)
+		repo := restaurantrepo.NewListRestaurantRepo(store, likeStore)
+		biz := restaurantbiz.NewListRestaurantBiz(repo)
 
 		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
 
