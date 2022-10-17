@@ -47,7 +47,7 @@ type Restaurant struct {
 }
 ```
 
-- GORM Preload:
+- GORM Preload: Not like join
 
 ```
 type User struct {
