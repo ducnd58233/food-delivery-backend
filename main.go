@@ -29,6 +29,8 @@ func main() {
 	dsn := mySqlConnStr
 	db, errCon := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
+	db = db.Debug()
+
 	if errCon != nil {
 		log.Fatalln(errCon)
 	}

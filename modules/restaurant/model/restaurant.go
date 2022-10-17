@@ -12,12 +12,14 @@ var (
 )
 
 type Restaurant struct {
-	common.SQLModel `json:",inline"` // embed struct
-	Name            string           `json:"name" gorm:"column:name;"`
-	Addr            string           `json:"address" gorm:"column:addr;"`
-	Logo            *common.Image    `json:"logo" gorm:"column:logo;"`
-	Cover           *common.Images   `json:"cover" gorm:"column:cover;"`
-	LikedCount      int              `json:"liked_count" gorm:"-"`
+	common.SQLModel `json:",inline"`   // embed struct
+	Name            string             `json:"name" gorm:"column:name;"`
+	UserId          int                `json:"-" gorm:"column:owner_id;"`
+	Addr            string             `json:"address" gorm:"column:addr;"`
+	Logo            *common.Image      `json:"logo" gorm:"column:logo;"`
+	Cover           *common.Images     `json:"cover" gorm:"column:cover;"`
+	User            *common.SimpleUser `json:"user" gorm:"preload:false;"`
+	LikedCount      int                `json:"liked_count" gorm:"-"`
 }
 
 func (Restaurant) TableName() string {
@@ -30,7 +32,7 @@ type RestaurantCreate struct {
 	Addr            string           `json:"address" gorm:"column:addr;"`
 	Logo            *common.Image    `json:"logo" gorm:"column:logo;"`
 	Cover           *common.Images   `json:"cover" gorm:"column:cover;"`
-	OwnerId         int              `json:"-" gorm:"column:owner_id;"`
+	UserId          int              `json:"-" gorm:"column:owner_id;"`
 }
 
 func (RestaurantCreate) TableName() string {
@@ -61,4 +63,8 @@ func (res *RestaurantCreate) Validate() error {
 // If admin or owner, show all information
 func (data *Restaurant) Mask(isAdminOrOwner bool) {
 	data.GenUID(common.DbTypeRestaurant)
+
+	if u := data.User; u != nil {
+		u.Mask(isAdminOrOwner)
+	}
 }
