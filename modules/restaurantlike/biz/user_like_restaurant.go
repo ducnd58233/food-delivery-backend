@@ -3,6 +3,7 @@ package restaurantlikebiz
 import (
 	"context"
 	"food-delivery/common"
+	"food-delivery/components/asyncjob"
 	restaurantlikemodel "food-delivery/modules/restaurantlike/model"
 )
 
@@ -47,7 +48,12 @@ func (biz *userLikeRestaurantBiz) LikeRestaurant(
 	// side effect
 	go func() {
 		defer common.AppRecover()
-		_ = biz.incStore.IncreaseLikeCount(ctx, data.RestaurantId)
+		
+		job := asyncjob.NewJob(func(ctx context.Context) error {
+			return biz.incStore.IncreaseLikeCount(ctx, data.RestaurantId)
+		})
+	
+		_ = asyncjob.NewGroup(true, job).Run(ctx)
 	}()
 
 	return nil
