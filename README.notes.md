@@ -73,3 +73,14 @@ db.Preload("Orders").Preload("Profile").Preload("Role").Find(&users)
 // SELECT * FROM profiles WHERE user_id IN (1, 2, 3, 4); // has one
 // SELECT * FROM roles WHERE id IN (4, 5, 6) // belongs to
 ```
+- Using ENUM in Golang:
+```
+const (
+	StateInit JobState = iota // 0
+	StateRunning // 1
+	StateFailed // 2
+	StateTimeout // 3
+	StateCompleted // 4
+	StateRetryFailed // 5
+)
+```
