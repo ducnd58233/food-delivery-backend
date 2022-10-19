@@ -4,6 +4,8 @@ import (
 	component "food-delivery/components"
 	"food-delivery/components/uploadprovider"
 	middleware "food-delivery/middlewares"
+	pubsublocal "food-delivery/pubsub/local"
+	"food-delivery/subscriber"
 	"log"
 	"os"
 
@@ -69,7 +71,11 @@ func main() {
 
 	s3Provider := uploadprovider.NewS3Provider(s3Bucketname, s3Region, s3APIKey, s3SecretKey, s3Domain)
 
-	appCtx := component.NewAppContext(db, s3Provider, secretKey)
+	appCtx := component.NewAppContext(db, s3Provider, secretKey, pubsublocal.NewPubSub())
+	// subscriber.Setup(appCtx)
+	if err := subscriber.NewEngine(appCtx).Start(); err != nil {
+		log.Fatalln(err)
+	}
 
 	router := gin.Default()
 	router.Use(middleware.Recover(appCtx))

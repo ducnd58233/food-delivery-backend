@@ -3,8 +3,8 @@ package restaurantlikebiz
 import (
 	"context"
 	"food-delivery/common"
-	"food-delivery/components/asyncjob"
 	restaurantlikemodel "food-delivery/modules/restaurantlike/model"
+	"food-delivery/pubsub"
 )
 
 type UserUnlikeRestaurantStore interface {
@@ -16,17 +16,26 @@ type UserUnlikeRestaurantStore interface {
 	Delete(ctx context.Context, userId, restaurantId int) error
 }
 
-type DecreaseLikeCountStore interface {
-	DecreaseLikeCount(ctx context.Context, id int) error
-}
+// type DecreaseLikeCountStore interface {
+// 	DecreaseLikeCount(ctx context.Context, id int) error
+// }
 
 type userUnlikeRestaurantBiz struct {
-	store     UserUnlikeRestaurantStore
-	descStore DecreaseLikeCountStore
+	store UserUnlikeRestaurantStore
+	// descStore DecreaseLikeCountStore
+	pubsub pubsub.Pubsub
 }
 
-func NewUserUnlikeRestaurantBiz(store UserUnlikeRestaurantStore, descStore DecreaseLikeCountStore) *userUnlikeRestaurantBiz {
-	return &userUnlikeRestaurantBiz{store: store, descStore: descStore}
+func NewUserUnlikeRestaurantBiz(
+	store UserUnlikeRestaurantStore,
+	// descStore DecreaseLikeCountStore,
+	pubsub pubsub.Pubsub,
+) *userUnlikeRestaurantBiz {
+	return &userUnlikeRestaurantBiz{
+		store: store,
+		// descStore: descStore,
+		pubsub: pubsub,
+	}
 }
 
 func (biz *userUnlikeRestaurantBiz) UnlikeRestaurant(
@@ -45,15 +54,21 @@ func (biz *userUnlikeRestaurantBiz) UnlikeRestaurant(
 	}
 
 	// side effect
-	go func() {
-		defer common.AppRecover()
+	// go func() {
+	// 	defer common.AppRecover()
 
-		job := asyncjob.NewJob(func(ctx context.Context) error {
-			return biz.descStore.DecreaseLikeCount(ctx, restaurantId)
-		})
+	// 	job := asyncjob.NewJob(func(ctx context.Context) error {
+	// 		return biz.descStore.DecreaseLikeCount(ctx, restaurantId)
+	// 	})
 
-		_ = asyncjob.NewGroup(true, job).Run(ctx)
-	}()
+	// 	_ = asyncjob.NewGroup(true, job).Run(ctx)
+	// }()
+	// New solution: use pubsub
+	// Do not inject directly here, hard to unit test. Inject through struct instead
+	biz.pubsub.Publish(ctx, common.TopicUserUnlikeRestaurant, pubsub.NewMessage(&restaurantlikemodel.Like{
+		RestaurantId: restaurantId,
+		UserId:       userId,
+	}))
 
 	return nil
 }
