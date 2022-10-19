@@ -32,9 +32,9 @@ func NewUserUnlikeRestaurantBiz(
 	pubsub pubsub.Pubsub,
 ) *userUnlikeRestaurantBiz {
 	return &userUnlikeRestaurantBiz{
-		store:     store,
+		store: store,
 		// descStore: descStore,
-		pubsub:    pubsub,
+		pubsub: pubsub,
 	}
 }
 
@@ -65,7 +65,10 @@ func (biz *userUnlikeRestaurantBiz) UnlikeRestaurant(
 	// }()
 	// New solution: use pubsub
 	// Do not inject directly here, hard to unit test. Inject through struct instead
-	biz.pubsub.Publish(ctx, common.TopicUserUnlikeRestaurant, pubsub.NewMessage(nil))
+	biz.pubsub.Publish(ctx, common.TopicUserUnlikeRestaurant, pubsub.NewMessage(&restaurantlikemodel.Like{
+		RestaurantId: restaurantId,
+		UserId:       userId,
+	}))
 
 	return nil
 }
