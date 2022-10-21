@@ -6,6 +6,7 @@ import (
 	component "food-delivery/components"
 	"food-delivery/components/asyncjob"
 	"food-delivery/pubsub"
+	"food-delivery/skio"
 	"log"
 )
 
@@ -15,11 +16,12 @@ type consumerJob struct {
 }
 
 type consumerEngine struct {
-	appCtx component.AppContext
+	appCtx         component.AppContext
+	realtimeEngine skio.RealtimeEngine
 }
 
-func NewEngine(appCtx component.AppContext) *consumerEngine {
-	return &consumerEngine{appCtx: appCtx}
+func NewEngine(appCtx component.AppContext, realtimeEngine skio.RealtimeEngine) *consumerEngine {
+	return &consumerEngine{appCtx: appCtx,	realtimeEngine: realtimeEngine}
 }
 
 // Put all subscriber here
@@ -28,12 +30,14 @@ func (engine *consumerEngine) Start() error {
 		common.TopicUserLikeRestaurant,
 		true,
 		RunIncreaseLikeCountAfterUserLikeRestaurant(engine.appCtx),
+		EmitRealtimeAfterUserLikeRestaurant(engine.appCtx, engine.realtimeEngine),
 	)
 
 	engine.startSubTopic(
 		common.TopicUserUnlikeRestaurant,
 		true,
 		RunDecreaseLikeCountAfterUserUnlikeRestaurant(engine.appCtx),
+		EmitRealtimeAfterUserUnlikeRestaurant(engine.appCtx, engine.realtimeEngine),
 	)
 
 	return nil

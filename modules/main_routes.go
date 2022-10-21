@@ -1,4 +1,4 @@
-package main
+package module
 
 import (
 	"food-delivery/common"
@@ -13,13 +13,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func mainRoute(router *gin.Engine, appCtx component.AppContext) {
+func MainRoute(router *gin.Engine, appCtx component.AppContext) {
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/register", usergin.RegisterHandler(appCtx))
 		v1.POST("/login", usergin.LoginHandler(appCtx))
 		v1.POST("/profile", middleware.RequiredAuth(appCtx), usergin.GetProfileHandler(appCtx))
-		
+
 		v1.POST("/upload", uploadgin.UploadHandler(appCtx))
 
 		restaurants := v1.Group("/restaurants", middleware.RequiredAuth(appCtx))
@@ -33,7 +33,7 @@ func mainRoute(router *gin.Engine, appCtx component.AppContext) {
 			restaurants.GET("/:id/liked-users", restaurantlikegin.GetListUsersLikeRestaurantHandler(appCtx))
 			restaurants.POST("/:id/like", restaurantlikegin.UserLikeRestaurantHandler(appCtx))
 			restaurants.DELETE("/:id/unlike", restaurantlikegin.UserUnlikeRestaurantHandler(appCtx))
-		
+
 		}
 
 		v1.GET("encode-uid", func(c *gin.Context) {
