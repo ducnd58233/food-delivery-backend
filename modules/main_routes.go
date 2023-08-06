@@ -33,7 +33,6 @@ func MainRoute(router *gin.Engine, appCtx component.AppContext) {
 			restaurants.GET("/:id/liked-users", restaurantlikegin.GetListUsersLikeRestaurantHandler(appCtx))
 			restaurants.POST("/:id/like", restaurantlikegin.UserLikeRestaurantHandler(appCtx))
 			restaurants.DELETE("/:id/unlike", restaurantlikegin.UserUnlikeRestaurantHandler(appCtx))
-
 		}
 
 		v1.GET("encode-uid", func(c *gin.Context) {

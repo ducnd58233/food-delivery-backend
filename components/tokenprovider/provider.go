@@ -34,7 +34,7 @@ var (
 type Token struct {
 	Token   string    `json:"token"`
 	Created time.Time `json:"created"`
-	Expiry  int       `json:"expory"`
+	Expiry  int       `json:"expiry"`
 }
 
 type TokenPayload struct {
